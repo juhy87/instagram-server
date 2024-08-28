@@ -9,4 +9,8 @@ public class AppController {
     public String main(){
         return "Hi Instagram hello";
     }
+    @GetMapping("/2")
+    public String main2(){
+        return "Hi Instagram hello 2";
+    }
 }
