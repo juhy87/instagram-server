@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: Instagram-server
+server:
+  port: 8050
