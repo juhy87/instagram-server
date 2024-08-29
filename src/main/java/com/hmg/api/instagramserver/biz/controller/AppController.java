@@ -13,4 +13,9 @@ public class AppController {
     public String main2(){
         return "Hi Instagram hello 2";
     }
+
+    @GetMapping("/3")
+    public String main3(){
+        return "Hi Instagram hello 3";
+    }
 }
