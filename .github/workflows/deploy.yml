@@ -4,28 +4,31 @@ on:
   push:
     branches:
       - main
+
 jobs:
-  Deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Hello World 찍기
         run: echo "Hello World"
 
-      - name: Github Repository에 올린 파일들을 불러오기
+      - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
-
-      - name: Test
-        run: |
-          ls
-          pwd
 
       - name: JDK 17버전 설치
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
+      - name: Test
+        run: |
+          ls
+          pwd
+
       - name: 테스트 및 빌드하기
         run: ./gradlew clean build
+
       - name: 빌드된 파일 이름 변경하기
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
 
@@ -38,19 +41,18 @@ jobs:
           source: project.jar
           target: /home/ubuntu/instagram-server/tobe
 
-      - name: SSH(원격 접속)로 EC2에 접속
+      - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USERNAME }}
-            key: ${{ secrets.EC2_PRIVATE_KEY }}
-            script_stop: true
-            script: |
-              rm -rf /home/ubuntu/instagram-server/current
-              mkdir /home/ubuntu/instagram-server/current
-              mv /home/ubuntu/instagram-server/tobe/project.jar /home/ubuntu/instagram-server/current/project.jar
-              cd /home/ubuntu/instagram-server/current
-              sudo fuser -k -n tcp 8050 || true
-              nohup java -jar project.jar > ./output.log 2>&1 & 
-              rm -rf /home/ubuntu/instagram-server/tobe
-
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            rm -rf /home/ubuntu/instagram-server/current
+            mkdir /home/ubuntu/instagram-server/current
+            mv /home/ubuntu/instagram-server/tobe/project.jar /home/ubuntu/instagram-server/current/project.jar
+            cd /home/ubuntu/instagram-server/current
+            sudo fuser -k -n tcp 8080 || true
+            nohup java -jar project.jar > ./output.log 2>&1 & 
+            rm -rf /home/ubuntu/instagram-server/tobe
